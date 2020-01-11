@@ -19,15 +19,15 @@ const wasm$ = from(import(/* webpackChunkName: "wasm" */ 'wasm-workshop-rust'))
 export const fibonacci$ = wasm$.pipe(
   switchMap(wasm => of(
     {
-      name: 'Imperative JS',
+      name: 'JS imperative Fibonacci',
       run: imperativeJsFibonacci
     },
     {
-      name: 'Recursive JS',
+      name: 'JS recursive Fibonacci',
       run: recursiveFibonacci
     },
     {
-      name: 'Rust',
+      name: 'Rust Fibonacci',
       run: wasm.fibonacci
     }
 
