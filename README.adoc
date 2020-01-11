@@ -116,4 +116,40 @@ Check the console in your browser's developer tools, to see logs with the input 
 I managed to implement both recursive and imperative variants with similar performance to the JS imperative variant.
 So in this case, it does not seem like WebAssembly gives you any benefits.
 Of course, calling back and forth between WebAssembly and JS a millions of times has its cost.
-Let's try implementing something that will not require as many roundtrips next!
+Let's try implementing something that will not require as many round trips next!
+
+== Selection sort
+
+https://en.wikipedia.org/wiki/Selection_sort[Selection sort] is a simple sorting algorithm to implement.
+More importantly, its high complexity (O(n^2^)) means we can spend more time doing number crunching in WebAssembly instead of passing values back to JS.
+
+To implement it, have a look at `typescript/src/model/selection-sort.ts` for inspiration. Next, open the Rust file and have a look.
+
+.In `rust/`, open the `selection_sort.rs`.
+[src, bash]
+----
+code .
+code src/fibonacci.rs
+----
+
+There are some new concepts in this signature, the parameter `list: &mut [u32]`.
+The `&` means that we have been passed a borrowed reference.
+`mut` makes the borrowed reference mutable.
+When working with a mutable reference, the strictness of the Rust compiler guarantees that the reference can't be mutated while in our scope.
+While out of scope for this workshop, "Rust by example" gives a good short intro to the rules of https://doc.rust-lang.org/rust-by-example/scope/move.html[ownership] and https://doc.rust-lang.org/rust-by-example/scope/borrow.html[borrowing] in Rust.
+
+The other new part of the signature is `[u32]`.
+The square brackets mean that we have a https://doc.rust-lang.org/rust-by-example/primitives/array.html[slice] of `u32`.
+In Rust, a slice is a list of values, similar to an array in many other languages.
+Rust also has the concept of array, but unlike slices their size has to be specified at compile time.
+
+Put together, this signature means that we have a mutable reference to a slice of `u32`.
+This means we can update the values of the slice in place.
+Therefore, we don't need to have a return value in this function.
+
+For implementing selection sort, https://doc.rust-lang.org/std/primitive.slice.html#method.swap[`swap()`] will be helpful.
+With https://doc.rust-lang.org/rust-by-example/flow_control/for.html[for loops], we now have we need to implement `selection_sort()`.
+
+Again, I was able to achieve similar performance to the JS implementation,
+which is a bit disappointing.
+It seems like browsers are great at optimizing JS!
