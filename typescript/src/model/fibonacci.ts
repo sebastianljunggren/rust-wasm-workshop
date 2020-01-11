@@ -1,29 +1,33 @@
 export function imperativeJsFibonacci (n: number): number {
-  if (n === 0) {
+  if (n < 1) {
     return 0
   } else if (n === 1) {
     return 1
   } else {
-    let n1 = 0
-    let n2 = 1
-    let fib = 1
+    let a = 0
+    let b = 1
+    let c = 1
     for (let i = 2; i <= n; i++) {
-      fib = n1 + n2
-      n1 = n2
-      n2 = fib
+      c = a + b
+      a = b
+      b = c
     }
-    return fib
+    return c
   }
 }
 
 export function recursiveFibonacci (n: number): number {
-  return recursiveFibonacciInner(n)
+  if (n >= 1) {
+    return recursiveFibonacciInner(n)
+  } else {
+    return 0
+  }
 }
 
-function recursiveFibonacciInner (n: number, n1: number = 0, n2: number = 1): number {
-  if (n <= 1) {
-    return n2
+function recursiveFibonacciInner (n: number, a: number = 0, b: number = 1): number {
+  if (n === 1) {
+    return b
   } else {
-    return recursiveFibonacciInner(n - 1, n2, n1 + n2)
+    return recursiveFibonacciInner(n - 1, b, a + b)
   }
 }
