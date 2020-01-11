@@ -18,7 +18,7 @@ import { Prop } from 'vue-property-decorator'
 import { benchmarks } from './model/benchmark'
 
 @Component
-export default class BenchmarkResultComponent extends Vue {
+export default class App extends Vue {
   benchmarks = benchmarks
 }
 </script>
@@ -107,6 +107,11 @@ h3 {
 
 p {
   margin: 1rem 0;
+}
+
+#app {
+  max-width: 1024px;
+  margin: 0 auto;
 }
 
 </style>
