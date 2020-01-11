@@ -1,0 +1,112 @@
+= WebAssembly with Rust
+
+WebAssembly allows you to write performant code in your language of choice that runs in the browser.
+In this workshop, you will translate JS implementations of some algorithms to Rust, and se how the implementation runs in the browser.
+
+The goal is to provide an intro to Rust and
+
+== Setup
+
+You will need to install Rust and NodeJS tooling for this workshop.
+
+- https://rustup.rs/[`rustup`] will help you install `rustc` (compiler) and `cargo` (package manager).
+- https://rustwasm.github.io/wasm-pack/[`wasm-pack`] lets you target WebAssembly with Rust.
+- https://nodejs.org/en/download/[NodeJS] with npm is needed for building the frontend.
+
+While you can use any editor/IDE you like,
+I suggest using https://code.visualstudio.com/Download[Visual Studio Code].
+ The https://marketplace.visualstudio.com/items?itemName=rust-lang.rust[Rust extension] will give you IntelliSense and compilation errors within the editor.
+
+After cloning this repository and installing the tools above, we are now ready to build and run the project.
+All commands will either need to be run in the `rust/` or `typescript/` directories.
+`rust/` contains the Rust project with a `Cargo.toml` file that specifies the https://crates.io/[crates] we depend on.
+`typescript/` contains a https://vuejs.org/[Vue.js] app for running our code.
+
+TIP: Keep a terminal open in both directories since you will need to switch back and forth every now and then.
+
+.In `rust/`, run `wasm-pack` to create a NodeJS package we can import with npm.
+[source, bash]
+----
+wasm-pack build --release
+----
+
+Next, we are ready to start the frontend and see what we have built.
+
+.In `typescript/`, install our npm dependencies and start the Vue development server.
+[source, bash]
+----
+npm install
+npm run serve
+----
+
+This will start a web server at http://localhost:8080.
+Open the page in a browser and have a look.
+Click *Run benchmark* and see what happens.
+If you make changes to the Rust code and build it again, the browser should be refreshed automatically.
+If this does not seem to work, a normal browser refresh should do the trick.
+Let's start writing some code!
+
+== Fibonacci sequence
+
+We'll start by implementing the https://en.wikipedia.org/wiki/Fibonacci_number[Fibonacci sequence].
+
+.In `rust/`, open the project and fibonacci.rs file in Visual Studio Code.
+[src, bash]
+----
+code .
+code src/fibonacci.rs
+----
+
+NOTE: Visual Studio Code will not properly identify the project as a Rust project if you don't open `rust/` as a project.
+
+Let's have a look at the contents.
+
+.rust/src/fibonacci.rs
+[src, rust]
+----
+use wasm_bindgen::prelude::*; // <1>
+
+#[wasm_bindgen] // <2>
+pub fn fibonacci(n: u32) -> u32 { // <3>
+    n // <4>
+}
+----
+<1> Imports the `wasm_bingen` crate, which allows us to export functions to JS and call JS functions.
+<2> Use the `#[wasm_bindgen]` to specify that we want to export the function below to JS.
+<3> Definition of the `fibonacci` function.
++
+- `pub` means that we want to export the function.
+- `fn` is the function keyword.
+- `(n: u32)` specifies that we have one parameter of type `u32`(unsigned 32-bit integer) with the name `n`.
+- `-> u32` is the return type of our function.
+<4> The implementation of the `fibonacci` function that currently returns the `n` parameter.
+
+Before we start implementing `fibonacci`, try changing the function implementation.
+
+[src, rust]
+----
+pub fn fibonacci(n: &str) -> String {
+    String::from(n)
+}
+----
+
+.In `rust/`, rebuild the Rust project.
+[source, bash]
+----
+wasm-pack build --release
+----
+
+It should compile fine, but have a look at the logs from `npm run serve`.
+There should be a compilation error complaining about incompatible types.
+`wasm-pack` automatically generates TypeScript type definitions for us, which will help us catch many errors.
+Nice!
+
+Restore the function and start implementing `fibonacci`. Have a look in `typescript/src/model/fibonacci.ts` for the JS implementations.
+Read up on https://doc.rust-lang.org/stable/rust-by-example/flow_control.html[flow of control in Rust] and try implementing either the recursive or imperative variant.
+
+Check the console in your browser's developer tools, to see logs with the input and output of your implementation.
+
+I managed to implement both recursive and imperative variants with similar performance to the JS imperative variant.
+So in this case, it does not seem like WebAssembly gives you any benefits.
+Of course, calling back and forth between WebAssembly and JS a millions of times has its cost.
+Let's try implementing something that will not require as many roundtrips next!
