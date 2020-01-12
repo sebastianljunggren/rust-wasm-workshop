@@ -154,7 +154,7 @@ Again, I was able to achieve similar performance to the JS implementation,
 which is a bit disappointing.
 It seems like browsers are great at optimizing JS!
 
-# Count orbits
+== Count orbits
 
 Let's have a  look at how to model data in Rust instead!
 For this we will use the https://adventofcode.com/2019/day/6[_Universal orbit map_] puzzle from day 6 of _Advent of Code 2019_. Read the linked description to get to know the domain a bit.
