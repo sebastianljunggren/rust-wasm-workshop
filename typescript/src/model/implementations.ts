@@ -43,7 +43,7 @@ const selectionSort$ = wasm$.pipe(
       run: selectionSort
     },
     {
-      name: 'Rust selectionSort',
+      name: 'Rust selection sort',
       run: wasm.selection_sort
     }
 
@@ -68,11 +68,11 @@ const { com, expectedOrbitCount } = createRandomAstronomicalObject(orbitCountSys
 const countOrbits$ = wasm$.pipe(
   switchMap(wasm => of(
     {
-      name: 'JS countOrbits',
+      name: 'JS count orbits',
       run: jsCountOrbits
     },
     {
-      name: 'Rust count_orbits',
+      name: 'Rust count orbits',
       run: wasm.count_orbits
     }
 

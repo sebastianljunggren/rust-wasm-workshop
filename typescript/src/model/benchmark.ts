@@ -51,11 +51,11 @@ const selectionSort = {
   description: `Sort ${selectionSortListSize.toLocaleString()} elements using the selection sort algorithm.`
 }
 
-const orbits = {
+const countOrbits = {
   id: BenchmarkId.ORBITS,
-  name: 'Orbits',
-  path: '/orbits',
+  name: 'Count orbits',
+  path: '/count-orbits',
   description: `The orbits problem from day 6 of Advent of Code 2019. Will be run on a system with ${orbitCountSystemSize.toLocaleString()} astronomical objects.`
 }
 
-export const benchmarks: Benchmark[] = [fibonacci, selectionSort, orbits]
+export const benchmarks: Benchmark[] = [fibonacci, selectionSort, countOrbits]

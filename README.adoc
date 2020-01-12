@@ -153,3 +153,151 @@ With https://doc.rust-lang.org/rust-by-example/flow_control/for.html[for loops],
 Again, I was able to achieve similar performance to the JS implementation,
 which is a bit disappointing.
 It seems like browsers are great at optimizing JS!
+
+# Count orbits
+
+Let's have a  look at how to model data in Rust instead!
+For this we will use the https://adventofcode.com/2019/day/6[_Universal orbit map_] puzzle from day 6 of _Advent of Code 2019_. Read the linked description to get to know the domain a bit.
+
+For this puzzle, the parsing is already completed and we will instead make the computation using a JS Object with this structure:
+
+[source, js]
+----
+const com = {
+  orbits: [
+    {
+      orbits: []
+    },
+    {
+      orbits: [
+        {
+          orbits: [
+            {
+              orbits: []
+            }
+          ]
+        },
+        {
+          orbits: []
+        }
+      ]
+    },
+    {
+    orbits: []
+    }
+  ]
+}
+----
+
+Let's look at how this can be parsed in Rust!
+
+.rust/src/orbits.rs
+[source, rust]
+----
+use wasm_bindgen::prelude::*;
+
+#[derive(Deserialize)] // <1>
+pub struct AstronomicalObject { // <2>
+    orbits: Vec<AstronomicalObject>, // <3>
+}
+
+#[wasm_bindgen]
+pub fn count_orbits(com: &JsValue) -> u32 { // <4>
+    let com: Result<AstronomicalObject, _> = com.into_serde(); // <5>
+    match com { // <6>
+        Ok(com) => com.orbits.len() as u32,
+        _ => 0,
+    }
+}
+----
+<1> This macro tells the https://serde.rs/[Serde library] to automatically deserialize this struct from JSON.
+<2> Definition of a https://doc.rust-lang.org/rust-by-example/custom_types/structs.html[`struct`] called `AstronomicalObject`
+(https://en.wikipedia.org/wiki/Astronomical_object[Apparently, that's the term to use for this!]).
+<3> The `struct` contains a https://doc.rust-lang.org/rust-by-example/std/vec.html[vector] of the objects that orbit it.
+In Rust, a Vector is similar to `ArrayList` in many other languages.
+<4> `JsValue` represents the JS Object we are going to parse.
+<5> The parsing is done with Serde.
+The `Result` type means that we have potential errors to handle.
+Also, we can use the `com` variable name again,
+because Rust supports https://en.wikipedia.org/wiki/Variable_shadowing[variable shadowing].
+<6> We handle the potential error with `match`.
+If we did not have any error (`Ok`) we return a dummy implementation. If something went wrong, we return `0`.
+
+Try solving the puzzle by adding a `impl` block to `AstronomicalObject` with a https://doc.rust-lang.org/rust-by-example/fn/methods.html[method] named `count_orbits`.
+
+TIP: Add a `depth: u32` parameter to the method.
+
+To test the method you can use the following unit test :
+
+[source, rust]
+----
+#[test]
+fn test_count_orbits() {
+    // Example from https://adventofcode.com/2019/day/6
+    let com = AstronomicalObject {
+        orbits: vec![
+            // B
+            AstronomicalObject {
+                orbits: vec![
+                    // G
+                    AstronomicalObject {
+                        orbits: vec![
+                            // H
+                            AstronomicalObject { orbits: Vec::new() },
+                        ],
+                    },
+                    // C
+                    AstronomicalObject {
+                        orbits: vec![
+                            // D
+                            AstronomicalObject {
+                                orbits: vec![
+                                    // E
+                                    AstronomicalObject {
+                                        orbits: vec![
+                                            // J
+                                            AstronomicalObject {
+                                                orbits: vec![
+                                                    // K
+                                                    AstronomicalObject {
+                                                        orbits: vec![
+                                                            // L
+                                                            AstronomicalObject {
+                                                                orbits: Vec::new(),
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                            // F
+                                            AstronomicalObject { orbits: Vec::new() },
+                                        ],
+                                    },
+                                    // I
+                                    AstronomicalObject { orbits: Vec::new() },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    };
+    let depth = 0;
+    assert_eq!(com.count_orbits(depth), 42);
+}
+----
+
+The test can be pasted into `rust/src/orbits.rs`. Run it with `cargo run test` or clicking the run test button in Visual Studio Code.
+
+Some more pointers to one possible solution: 
+
+* Take a look in `typescript/model/orbits.ts` for a JS solution.
+* You can call `iter()` on a Vector and then call methods like `map()` and `sum()` on it.
+* `map()` takes a https://doc.rust-lang.org/rust-by-example/fn/closures.html[closure] as a parameter.
+
+Again, I saw no performance improvements from using WebAssembly.
+However, the Internet is full of interesting examples of this.
+One example is https://wasmboy.app/benchmark/[WasmBoy], a GameBoy emulator written in AssemblyScript (a subset of TypeScript) and cross compiled to JS and WebAssembly.
+
+Thanks for trying out these exercises. I hope you enjoyed them even though the result was a bit disappointing!
