@@ -223,7 +223,7 @@ because Rust supports https://en.wikipedia.org/wiki/Variable_shadowing[variable 
 <6> We handle the potential error with `match`.
 If we did not have any error (`Ok`) we return a dummy implementation. If something went wrong, we return `0`.
 
-Try solving the puzzle by adding a `impl` block to `AstronomicalObject` with a https://doc.rust-lang.org/rust-by-example/fn/methods.html[method] named `count_orbits`.
+Try solving the puzzle by adding an `impl` block to `AstronomicalObject` with a https://doc.rust-lang.org/rust-by-example/fn/methods.html[method] named `count_orbits`.
 
 TIP: Add a `depth: u32` parameter to the method.
 
