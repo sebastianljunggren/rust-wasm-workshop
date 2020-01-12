@@ -148,7 +148,7 @@ This means we can update the values of the slice in place.
 Therefore, we don't need to have a return value in this function.
 
 For implementing selection sort, https://doc.rust-lang.org/std/primitive.slice.html#method.swap[`swap()`] will be helpful.
-With https://doc.rust-lang.org/rust-by-example/flow_control/for.html[for loops], we now have we need to implement `selection_sort()`.
+With https://doc.rust-lang.org/rust-by-example/flow_control/for.html[for loops], we now have everything we need to implement `selection_sort()`.
 
 Again, I was able to achieve similar performance to the JS implementation,
 which is a bit disappointing.

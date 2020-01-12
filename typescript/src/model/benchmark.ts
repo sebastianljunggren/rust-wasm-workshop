@@ -1,8 +1,9 @@
-import { fibonacciIterations, fibonacciNumber, sortListSize } from './constants'
+import { fibonacciIterations, fibonacciNumber, selectionSortListSize, orbitCountSystemSize } from './constants'
 
 export enum BenchmarkId {
     FIBONACCI = 'FIBONACCI',
-    SELECTION_SORT = 'SELECTION_SORT'
+    SELECTION_SORT = 'SELECTION_SORT',
+    ORBITS = 'ORBITS'
 }
 
 export interface Benchmark {
@@ -47,7 +48,14 @@ const selectionSort = {
   id: BenchmarkId.SELECTION_SORT,
   name: 'Selection sort',
   path: '/selection-sort',
-  description: `Sort ${sortListSize.toLocaleString()} elements`
+  description: `Sort ${selectionSortListSize.toLocaleString()} elements using the selection sort algorithm.`
 }
 
-export const benchmarks: Benchmark[] = [fibonacci, selectionSort]
+const orbits = {
+  id: BenchmarkId.ORBITS,
+  name: 'Orbits',
+  path: '/orbits',
+  description: `The orbits problem from day 6 of Advent of Code 2019. Will be run on a system with ${orbitCountSystemSize.toLocaleString()} astronomical objects.`
+}
+
+export const benchmarks: Benchmark[] = [fibonacci, selectionSort, orbits]

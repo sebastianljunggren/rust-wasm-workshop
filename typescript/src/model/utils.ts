@@ -1,16 +1,18 @@
-export function time (f: () => any): number {
+export function time<T> (f: () => T): {millis: number, result: T} {
   const start = new Date()
-  f()
+  const result = f()
   const end = new Date()
-  return end.valueOf() - start.valueOf()
+  const millis = end.valueOf() - start.valueOf()
+  return { millis, result }
 }
 
-export function timeIterations (iterations: number, f: () => any) {
-  return time(() => {
+export function timeIterations (iterations: number, f: () => any): number {
+  const { millis } = time(() => {
     for (let i = 0; i < iterations; i++) {
       f()
     }
   })
+  return millis
 }
 
 export function arrayEquals (a: Uint32Array, b: Uint32Array): boolean {
