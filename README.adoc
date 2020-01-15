@@ -8,7 +8,7 @@ ifdef::env-github[]
 endif::[]
 
 WebAssembly allows you to write performant code in your language of choice that runs in the browser.
-In this workshop, you will translate JS implementations of some algorithms to Rust, and se how the implementation runs in the browser.
+In this workshop, you will translate JS implementations of some algorithms to Rust, and see how the implementations run in the browser.
 
 The goals of this workshop are to provide an intro to Rust and show how to work with WebAssembly in a web app.
 
