@@ -257,8 +257,16 @@ Some more pointers to one possible solution:
 * You can call `iter()` on a Vector and then call methods like `map()` and `sum()` on it.
 * `map()` takes a https://doc.rust-lang.org/rust-by-example/fn/closures.html[closure] as a parameter.
 
-Again, I saw no performance improvements from using WebAssembly.
-However, the Internet is full of interesting examples of this.
+This time, I actually saw an improvement in the WebAssembly performance.
+I believe that the browser (tested in Firefox and Chrome) does not optimize for tail recursion in this case,
+unlike the Rust compiler.
+
+== Conclusion
+
+My conclusion, after all this,
+is that it is not straight forward to measure the performance difference between JS and WebAssembly.
+Of course, this may be because we have been using "toy examples" that are not close to real world apps.
+The Internet is full of more complex examples such as emulators and image processing.
 One example is https://wasmboy.app/benchmark/[WasmBoy], a GameBoy emulator written in AssemblyScript (a subset of TypeScript) and cross compiled to JS and WebAssembly.
 
 Thanks for trying out these exercises. I hope you enjoyed them even though the result was a bit disappointing!
