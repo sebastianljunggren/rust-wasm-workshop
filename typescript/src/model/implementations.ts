@@ -66,17 +66,25 @@ function createRandomAstronomicalObject (size: number): {com: AstronomicalObject
 
 const { com, expectedOrbitCount } = createRandomAstronomicalObject(orbitCountSystemSize)
 const countOrbits$ = wasm$.pipe(
-  switchMap(wasm => of(
-    {
-      name: 'JS count orbits',
-      run: jsCountOrbits
-    },
-    {
-      name: 'Rust count orbits',
-      run: wasm.count_orbits
-    }
+  switchMap(({ parse_and_count_orbits, OrbitsBenchmark }) => {
+    const preloadedRunner = OrbitsBenchmark.new(com)
+    const preloadedRun = () => preloadedRunner.run()
 
-  )),
+    return of(
+      {
+        name: 'JS count orbits',
+        run: jsCountOrbits
+      },
+      {
+        name: 'Rust count orbits',
+        run: parse_and_count_orbits
+      },
+      {
+        name: 'Rust preloaded count orbits',
+        run: preloadedRun
+      }
+    )
+  }),
   runImplementation(orbitCountRunner(com, expectedOrbitCount))
 )
 

@@ -159,7 +159,14 @@ It seems like browsers are great at optimizing JS!
 Let's have a  look at how to model data in Rust instead!
 For this we will use the https://adventofcode.com/2019/day/6[_Universal orbit map_] puzzle from day 6 of _Advent of Code 2019_. Read the linked description to get to know the domain a bit.
 
-For this puzzle, the parsing is already completed and we will instead make the computation using a JS Object with this structure:
+To demonstrate the overhead of passing data to WebAssembly,
+this benchmark has a preloaded version where data is passed to Wasm before running the benchmark.
+Try running the benchmarks before making the  implementation to get an idea of the cost.
+
+NOTE: This may not be be the optimal way of passing data between JS and WebAssembly.
+
+For this puzzle, we will skip the parsing of the string data.
+Instead, we will make the computation using a JS Object with this structure:
 
 [source, js]
 ----
@@ -201,14 +208,25 @@ pub struct AstronomicalObject { // <2>
     orbits: Vec<AstronomicalObject>, // <3>
 }
 
-#[wasm_bindgen]
-pub fn count_orbits(com: &JsValue) -> u32 { // <4>
+pub fn parse_astronomical_object(com: &JsValue) -> AstronomicalObject { // <4>
     let com: Result<AstronomicalObject, _> = com.into_serde(); // <5>
     match com { // <6>
-        Ok(com) => com.orbits.len() as u32,
-        _ => 0,
+        Ok(com) => com,
+        _ => AstronomicalObject { orbits: Vec::new() },
     }
 }
+
+pub fn count_orbits(com: &AstronomicalObject) -> u32 { // <7>
+    com.orbits.len() as u32
+}
+
+#[wasm_bindgen]
+pub fn parse_and_count_orbits(com: &JsValue) -> u32 { // <8>
+    let com = parse_astronomical_object(com);
+    count_orbits(&com)
+}
+
+// Omitted the rest of the file
 ----
 <1> This macro tells the https://serde.rs/[Serde library] to automatically deserialize this struct from JSON.
 <2> Definition of a https://doc.rust-lang.org/rust-by-example/custom_types/structs.html[`struct`] called `AstronomicalObject`
@@ -221,74 +239,17 @@ The `Result` type means that we have potential errors to handle.
 Also, we can use the `com` variable name again,
 because Rust supports https://en.wikipedia.org/wiki/Variable_shadowing[variable shadowing].
 <6> We handle the potential error with `match`.
-If we did not have any error (`Ok`) we return a dummy implementation. If something went wrong, we return `0`.
+If we did not have any error (`Ok`) we return a dummy implementation. If something went wrong, we return an empty `AstronomicalObject`.
+<7> The function we will implement.
+Currently, it has a dummy implementation.
+<8> Definition of the function we export to JS that parses the JS and runs the computation.
 
 Try solving the puzzle by adding an `impl` block to `AstronomicalObject` with a https://doc.rust-lang.org/rust-by-example/fn/methods.html[method] named `count_orbits`.
 
 TIP: Add a `depth: u32` parameter to the method.
 
-To test the method you can use the following unit test :
-
-[source, rust]
-----
-#[test]
-fn test_count_orbits() {
-    // Example from https://adventofcode.com/2019/day/6
-    let com = AstronomicalObject {
-        orbits: vec![
-            // B
-            AstronomicalObject {
-                orbits: vec![
-                    // G
-                    AstronomicalObject {
-                        orbits: vec![
-                            // H
-                            AstronomicalObject { orbits: Vec::new() },
-                        ],
-                    },
-                    // C
-                    AstronomicalObject {
-                        orbits: vec![
-                            // D
-                            AstronomicalObject {
-                                orbits: vec![
-                                    // E
-                                    AstronomicalObject {
-                                        orbits: vec![
-                                            // J
-                                            AstronomicalObject {
-                                                orbits: vec![
-                                                    // K
-                                                    AstronomicalObject {
-                                                        orbits: vec![
-                                                            // L
-                                                            AstronomicalObject {
-                                                                orbits: Vec::new(),
-                                                            },
-                                                        ],
-                                                    },
-                                                ],
-                                            },
-                                            // F
-                                            AstronomicalObject { orbits: Vec::new() },
-                                        ],
-                                    },
-                                    // I
-                                    AstronomicalObject { orbits: Vec::new() },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
-    };
-    let depth = 0;
-    assert_eq!(com.count_orbits(depth), 42);
-}
-----
-
-The test can be pasted into `rust/src/orbits.rs`. Run it with `cargo run test` or clicking the run test button in Visual Studio Code.
+To test the method you can use the unit test that is also part of `rust/src/orbits.rs`.
+Run it with `cargo run test` or clicking the run test button in Visual Studio Code.
 
 Some more pointers to one possible solution: 
 
