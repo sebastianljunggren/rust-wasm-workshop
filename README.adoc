@@ -266,7 +266,7 @@ unlike the Rust compiler.
 If you like, you can have a look at some of the internals of how the tools work.
 
 - Have a look in `rust/pkg/rust_wasm_workshop_rust.js`.
-This is the generated glu code for interoperability with JS.
+This is the generated glue code for interoperability with JS.
 How are we able to send the `AstronomicalObject` to Rust?
 - We probably have a lot of overhead for sending the list for the selection sort algorithm.
 Try implementing a "preloaded" variant like the one for count orbits.
