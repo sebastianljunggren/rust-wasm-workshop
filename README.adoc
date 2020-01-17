@@ -53,6 +53,10 @@ If you make changes to the Rust code and build it again, the browser should be r
 If this does not seem to work, a normal browser refresh should do the trick.
 Let's start writing some code!
 
+TIP: When testing your implementations run the benchmarks a few times.
+There will be differences between runs and outliers.
+It's also good to try different browsers!
+
 == Fibonacci sequence
 
 We'll start by implementing the https://en.wikipedia.org/wiki/Fibonacci_number[Fibonacci sequence].
@@ -137,6 +141,7 @@ The `&` means that we have been passed a borrowed reference.
 `mut` makes the borrowed reference mutable.
 When working with a mutable reference, the strictness of the Rust compiler guarantees that the reference can't be mutated by something else while we use the value.
 While outside the scope for this workshop, "Rust by example" gives a good short intro to the rules of https://doc.rust-lang.org/rust-by-example/scope/move.html[ownership] and https://doc.rust-lang.org/rust-by-example/scope/borrow.html[borrowing] in Rust.
+This is what makes memory safety possible for Rust without garbage collection.
 
 The other new part of the signature is `[u32]`.
 The square brackets mean that we have a https://doc.rust-lang.org/rust-by-example/primitives/array.html[slice] of `u32`.
@@ -150,7 +155,7 @@ Therefore, we don't need to have a return value in this function.
 For implementing selection sort, https://doc.rust-lang.org/std/primitive.slice.html#method.swap[`swap()`] will be helpful.
 With https://doc.rust-lang.org/rust-by-example/flow_control/for.html[for loops], we now have everything we need to implement `selection_sort()`.
 
-Again, I was able to achieve similar performance to the JS implementation,
+Again, I was only able to achieve similar performance to the JS implementation,
 which is a bit disappointing.
 It seems like browsers are great at optimizing JS!
 
@@ -228,28 +233,28 @@ pub fn parse_and_count_orbits(com: &JsValue) -> u32 { // <8>
 
 // Omitted the rest of the file
 ----
-<1> This macro tells the https://serde.rs/[Serde library] to automatically deserialize this struct from JSON.
+<1> This macro tells the https://serde.rs/[Serde library] to automatically implement deserialization from JSON for this struct.
 <2> Definition of a https://doc.rust-lang.org/rust-by-example/custom_types/structs.html[`struct`] called `AstronomicalObject`
 (https://en.wikipedia.org/wiki/Astronomical_object[Apparently, that's the term to use for this!]).
 <3> The `struct` contains a https://doc.rust-lang.org/rust-by-example/std/vec.html[vector] of the objects that orbit it.
-In Rust, a Vector is similar to `ArrayList` in many other languages.
+In Rust, a Vector is similar to `ArrayList` in some other languages.
 <4> `JsValue` represents the JS Object we are going to parse.
 <5> The parsing is done with Serde.
-The `Result` type means that we have potential errors to handle.
+The `Result` type is Rust's way of indicating that there may be errors to handle.
 Also, we can use the `com` variable name again,
 because Rust supports https://en.wikipedia.org/wiki/Variable_shadowing[variable shadowing].
 <6> We handle the potential error with `match`.
 If we did not have any error (`Ok`) we return a dummy implementation. If something went wrong, we return an empty `AstronomicalObject`.
 <7> The function we will implement.
 Currently, it has a dummy implementation.
-<8> Definition of the function we export to JS that parses the JS and runs the computation.
+<8> The function we export to JS that parses the JS and runs the computation.
 
 Try solving the puzzle by adding an `impl` block to `AstronomicalObject` with a https://doc.rust-lang.org/rust-by-example/fn/methods.html[method] named `count_orbits`.
 
 TIP: Add a `depth: u32` parameter to the method.
 
 To test the method you can use the unit test that is also part of `rust/src/orbits.rs`.
-Run it with `cargo run test` or clicking the run test button in Visual Studio Code.
+Run it with `cargo run test` or by clicking the run test button in Visual Studio Code.
 
 Some more pointers to one possible solution: 
 
@@ -257,9 +262,7 @@ Some more pointers to one possible solution:
 * You can call `iter()` on a Vector and then call methods like `map()` and `sum()` on it.
 * `map()` takes a https://doc.rust-lang.org/rust-by-example/fn/closures.html[closure] as a parameter.
 
-This time, I actually saw an improvement in the WebAssembly performance.
-I believe that the browser (tested in Firefox and Chrome) does not optimize for tail recursion in this case,
-unlike the Rust compiler.
+This time, I actually saw a substantial improvement in the WebAssembly performance!
 
 == Extra credits
 
@@ -268,17 +271,15 @@ If you like, you can have a look at some of the internals of how the tools work.
 - Have a look in `rust/pkg/rust_wasm_workshop_rust.js`.
 This is the generated glue code for interoperability with JS.
 How are we able to send the `AstronomicalObject` to Rust?
-- We probably have a lot of overhead for sending the list for the selection sort algorithm.
-Try implementing a "preloaded" variant like the one for count orbits.
-See `rust/src/lib.rs` and `typescript/source/model/implementations.ts` to see how it was done for the orbits exercise.
 - Try inspecting the Wasm in the developer tools in the browser.
 Unfortunately, I haven't managed to set up source maps.
-In general, it seems like the developer tools experience is not quite there yet.
-- Currently, the Rust compiler (that uses https://llvm.org/[LLVM]) is set to optimize for small code size (`opt-level = "s"`).
+In general, it seems like the developer tools experience with Wasm is not quite there yet.
+- In this project, the Rust compiler (that uses https://llvm.org/[LLVM]) is set to optimize for small code size (`opt-level = "s"`).
+This setting can be modified in `rust/cargo.toml`.
 Try changing to a value of `3` for the highest performance.
-Then try `z` for even smaller code size and run the benchmarks.
+Will this impact any of the benchmarks? What about the size of the wasm-file  (check the network tab in the browser developer tools)?
+You can also try `z` for even smaller code size than `s`.
 Read more about the options here: https://doc.rust-lang.org/cargo/reference/manifest.html.
-Can you see any difference in the benchmarks?
 
 == Conclusion
 
@@ -288,4 +289,4 @@ Of course, this may be because we have been using "toy examples" that are not cl
 The Internet is full of more complex examples such as emulators and image processing.
 One example is https://wasmboy.app/benchmark/[WasmBoy], a GameBoy emulator written in AssemblyScript (a subset of TypeScript) and cross compiled to JS and WebAssembly.
 
-Thanks for trying out these exercises. I hope you enjoyed them even though the result was a bit disappointing!
+Thanks for trying out these exercises!
