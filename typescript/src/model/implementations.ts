@@ -15,7 +15,7 @@ export interface BenchmarkImplementation<I, O> {
 
 const runImplementation = <I, O>(r: BenchmarkRunner<I, O>) => map((i: BenchmarkImplementation<I, O>) => r(i))
 
-const wasm$ = from(import(/* webpackChunkName: "wasm" */ 'wasm-workshop-rust'))
+const wasm$ = from(import(/* webpackChunkName: "wasm" */ 'rust-wasm-workshop-rust'))
 
 const fibonacci$ = wasm$.pipe(
   switchMap(wasm => of(
@@ -66,7 +66,9 @@ function createRandomAstronomicalObject (size: number): {com: AstronomicalObject
 
 const { com, expectedOrbitCount } = createRandomAstronomicalObject(orbitCountSystemSize)
 const countOrbits$ = wasm$.pipe(
+  /* eslint-disable */
   switchMap(({ parse_and_count_orbits, OrbitsBenchmark }) => {
+    /* eslint-enable */
     const preloadedRunner = OrbitsBenchmark.new(com)
     const preloadedRun = () => preloadedRunner.run()
 

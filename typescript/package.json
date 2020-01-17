@@ -1,5 +1,5 @@
 {
-  "name": "wasm-rust-workshop-typescript",
+  "name": "rust-wasm-workshop-typescript",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -16,7 +16,7 @@
     "vue-property-decorator": "^8.3.0",
     "vue-router": "^3.1.5",
     "vue-rx": "^6.2.0",
-    "wasm-workshop-rust": "file:../rust/pkg"
+    "rust-wasm-workshop-rust": "file:../rust/pkg"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
