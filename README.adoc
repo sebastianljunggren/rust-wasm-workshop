@@ -57,14 +57,14 @@ Let's start writing some code!
 
 We'll start by implementing the https://en.wikipedia.org/wiki/Fibonacci_number[Fibonacci sequence].
 
-.In `rust/`, open the project and fibonacci.rs file in Visual Studio Code.
+.In `rust/`, open the project and the `fibonacci.rs` file in Visual Studio Code.
 [src, bash]
 ----
 code .
 code src/fibonacci.rs
 ----
 
-NOTE: Visual Studio Code will not properly identify the project as a Rust project if you don't open `rust/` as a project.
+NOTE: Visual Studio Code will not properly identify the project as a Rust project if you don't open the `rust/` subdirectory  as a project.
 
 Let's have a look at the contents.
 
@@ -79,7 +79,7 @@ pub fn fibonacci(n: u32) -> u32 { // <3>
 }
 ----
 <1> Imports the `wasm_bingen` crate, which allows us to export functions to JS and call JS functions.
-<2> Use the `#[wasm_bindgen]` to specify that we want to export the function below to JS.
+<2> Use the `#[wasm_bindgen]` macro to specify that we want to export the function below to JS.
 <3> Definition of the `fibonacci` function.
 +
 - `pub` means that we want to export the function.
@@ -115,7 +115,7 @@ Check the console in your browser's developer tools, to see logs with the input 
 
 I managed to implement both recursive and imperative variants with similar performance to the JS imperative variant.
 So in this case, it does not seem like WebAssembly gives you any benefits.
-Of course, calling back and forth between WebAssembly and JS a millions of times has its cost.
+Of course, calling back and forth between WebAssembly and JS millions of times has its cost.
 Let's try implementing something that will not require as many round trips next!
 
 == Selection sort
@@ -125,7 +125,7 @@ More importantly, its high complexity (O(n^2^)) means we can spend more time doi
 
 To implement it, have a look at `typescript/src/model/selection-sort.ts` for inspiration. Next, open the Rust file and have a look.
 
-.In `rust/`, open the `selection_sort.rs`.
+.In `rust/`, open the `selection_sort.rs` file.
 [src, bash]
 ----
 code .
@@ -135,8 +135,8 @@ code src/fibonacci.rs
 There are some new concepts in this signature, the parameter `list: &mut [u32]`.
 The `&` means that we have been passed a borrowed reference.
 `mut` makes the borrowed reference mutable.
-When working with a mutable reference, the strictness of the Rust compiler guarantees that the reference can't be mutated while in our scope.
-While out of scope for this workshop, "Rust by example" gives a good short intro to the rules of https://doc.rust-lang.org/rust-by-example/scope/move.html[ownership] and https://doc.rust-lang.org/rust-by-example/scope/borrow.html[borrowing] in Rust.
+When working with a mutable reference, the strictness of the Rust compiler guarantees that the reference can't be mutated by something else while we use the value.
+While outside the scope for this workshop, "Rust by example" gives a good short intro to the rules of https://doc.rust-lang.org/rust-by-example/scope/move.html[ownership] and https://doc.rust-lang.org/rust-by-example/scope/borrow.html[borrowing] in Rust.
 
 The other new part of the signature is `[u32]`.
 The square brackets mean that we have a https://doc.rust-lang.org/rust-by-example/primitives/array.html[slice] of `u32`.
@@ -260,6 +260,25 @@ Some more pointers to one possible solution:
 This time, I actually saw an improvement in the WebAssembly performance.
 I believe that the browser (tested in Firefox and Chrome) does not optimize for tail recursion in this case,
 unlike the Rust compiler.
+
+== Extra credits
+
+If you like, you can have a look at some of the internals of how the tools work.
+
+- Have a look in `rust/pkg/rust_wasm_workshop_rust.js`.
+This is the generated glu code for interoperability with JS.
+How are we able to send the `AstronomicalObject` to Rust?
+- We probably have a lot of overhead for sending the list for the selection sort algorithm.
+Try implementing a "preloaded" variant like the one for count orbits.
+See `rust/src/lib.rs` and `typescript/source/model/implementations.ts` to see how it was done for the orbits exercise.
+- Try inspecting the Wasm in the developer tools in the browser.
+Unfortunately, I haven't managed to set up source maps.
+In general, it seems like the developer tools experience is not quite there yet.
+- Currently, the Rust compiler (that uses https://llvm.org/[LLVM]) is set to optimize for small code size (`opt-level = "s"`).
+Try changing to a value of `3` for the highest performance.
+Then try `z` for even smaller code size and run the benchmarks.
+Read more about the options here: https://doc.rust-lang.org/cargo/reference/manifest.html.
+Can you see any difference in the benchmarks?
 
 == Conclusion
 
